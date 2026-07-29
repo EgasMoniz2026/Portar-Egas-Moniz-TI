@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal TI — Departamento Informático</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #0f2846; }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  #portal-ti-root {
+    --bg: #0f2846;
+    --bg-grid: #143255;
+    --panel: #123152;
+    --panel-border: #2c5478;
+    --ink: #eaf3fa;
+    --ink-dim: #8fb0c9;
+    --cyan: #8fd7e8;
+    --amber: #f2a65a;
+    --red: #e2735a;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--ink);
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(143,215,232,0.06) 28px),
+      repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(143,215,232,0.06) 28px),
+      var(--bg);
+    min-height: 100%;
+    padding: 28px 20px 60px;
+    box-sizing: border-box;
+  }
+  #portal-ti-root * { box-sizing: border-box; }
+  .pt-mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .pt-header {
+    max-width: 1120px;
+    margin: 0 auto 28px;
+    border-bottom: 1px dashed var(--panel-border);
+    padding-bottom: 18px;
+  }
+  .pt-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .pt-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .pt-sub { font-size: 13px; color: var(--ink-dim); max-width: 620px; line-height: 1.5; }
+
+  .pt-toolbar {
+    max-width: 1120px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .pt-search {
+    flex: 1 1 240px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 3px;
+    outline: none;
+  }
+  .pt-search::placeholder { color: var(--ink-dim); }
+  .pt-search:focus { border-color: var(--cyan); }
+
+  .pt-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    color: var(--cyan);
+    padding: 10px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .pt-btn:hover { border-color: var(--cyan); background: rgba(143,215,232,0.08); }
+  .pt-btn:focus-visible, .pt-search:focus-visible, .pt-icon:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .pt-btn.amber { color: var(--amber); }
+  .pt-btn.amber:hover { border-color: var(--amber); background: rgba(242,166,90,0.08); }
+
+  .pt-grid {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px 26px;
+  }
+
+  .pt-panel { position: relative; padding-top: 14px; }
+  .pt-tag {
+    position: absolute;
+    top: -14px;
+    left: 14px;
+    background: var(--bg);
+    padding: 0 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+  }
+  .pt-box {
+    border: 1px solid var(--panel-border);
+    background: var(--panel);
+    border-radius: 4px;
+    padding: 16px;
+  }
+  .pt-cat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dashed var(--panel-border);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .pt-cat-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .pt-cat-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .pt-icon {
+    background: transparent;
+    border: none;
+    color: var(--ink-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    line-height: 1;
+  }
+  .pt-icon:hover { color: var(--cyan); background: rgba(143,215,232,0.08); }
+  .pt-icon.danger:hover { color: var(--red); background: rgba(226,115,90,0.1); }
+
+  .pt-link-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid rgba(44,84,120,0.4);
+  }
+  .pt-link-row:last-of-type { border-bottom: none; }
+  .pt-jack {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--cyan);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .pt-link-body { flex: 1; min-width: 0; }
+  .pt-link-name {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pt-link-name:hover { color: var(--cyan); text-decoration: underline; }
+  .pt-link-url {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    word-break: break-all;
+    display: block;
+    margin-top: 1px;
+  }
+  .pt-link-desc { font-size: 12px; color: var(--ink-dim); margin-top: 3px; line-height: 1.4; }
+  .pt-link-actions { display: flex; gap: 2px; flex-shrink: 0; }
+
+  .pt-empty { font-size: 12px; color: var(--ink-dim); padding: 8px 4px; font-style: italic; }
+
+  .pt-form {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .pt-input {
+    background: var(--bg);
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 3px;
+    outline: none;
+    width: 100%;
+  }
+  .pt-input:focus { border-color: var(--cyan); }
+  .pt-form-actions { display: flex; gap: 8px; margin-top: 2px; }
+  .pt-form-actions .pt-btn { padding: 7px 12px; font-size: 11px; }
+
+  .pt-addcat {
+    border: 1px dashed var(--panel-border);
+    border-radius: 4px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90px;
+  }
+
+  .pt-footer {
+    max-width: 1120px;
+    margin: 34px auto 0;
+    padding-top: 16px;
+    border-top: 1px dashed var(--panel-border);
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pt-footer a { color: var(--ink-dim); }
+  .pt-reset { background: none; border: none; color: var(--ink-dim); text-decoration: underline; cursor: pointer; font-size: 11.5px; font-family: inherit; }
+  .pt-reset:hover { color: var(--red); }
+
+  .pt-loading { text-align: center; padding: 60px 0; color: var(--ink-dim); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+
+  .pt-lock-wrap { max-width: 380px; margin: 70px auto; }
+  .pt-lock-box { border: 1px solid var(--panel-border); background: var(--panel); border-radius: 4px; padding: 24px; }
+  .pt-lock-title { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .pt-lock-sub { font-size: 12.5px; color: var(--ink-dim); margin-bottom: 16px; line-height: 1.5; }
+  .pt-lock-error { color: var(--red); font-size: 12px; margin: -4px 0 4px; }
+  .pt-lock-hint { font-size: 11px; color: var(--ink-dim); margin-top: 16px; line-height: 1.5; border-top: 1px dashed var(--panel-border); padding-top: 12px; }
+  .pt-lock-link { background: none; border: none; color: var(--cyan); text-decoration: underline; cursor: pointer; font-size: 11.5px; padding: 0; font-family: inherit; }
+  .pt-logout-bar { max-width: 1120px; margin: 0 auto 10px; display: flex; justify-content: flex-end; gap: 14px; }
+
+  @media (max-width: 480px) {
+    .pt-title { font-size: 22px; }
+    .pt-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="portal-ti-root">
+  <div id="pt-app" class="pt-loading">A carregar painel…</div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'portal-ti-links';
+  const LOCK_KEY = 'portal-ti-pwd-hash';
+  const SESSION_FLAG = 'portal-ti-unlocked';
+
+  const defaultData = {
+    categories: [
+      { id: 'c1', name: 'Helpdesk & Suporte', links: [
+        { id: 'l1', name: 'GLPI', url: 'https://glpi-project.org', desc: 'Gestão de pedidos e inventário (exemplo — trocar pelo link interno)' },
+        { id: 'l2', name: 'osTicket', url: 'https://osticket.com', desc: 'Sistema de tickets alternativo' }
+      ]},
+      { id: 'c2', name: 'Monitorização', links: [
+        { id: 'l3', name: 'Zabbix', url: 'https://www.zabbix.com', desc: 'Monitorização de servidores e rede' },
+        { id: 'l4', name: 'Grafana', url: 'https://grafana.com', desc: 'Dashboards de métricas' }
+      ]},
+      { id: 'c3', name: 'Documentação', links: [
+        { id: 'l5', name: 'Confluence', url: 'https://www.atlassian.com/software/confluence', desc: 'Wiki de procedimentos internos' }
+      ]},
+      { id: 'c4', name: 'Segurança', links: [
+        { id: 'l6', name: 'Bitwarden', url: 'https://bitwarden.com', desc: 'Cofre de passwords partilhado' },
+        { id: 'l7', name: 'Wazuh', url: 'https://wazuh.com', desc: 'Deteção de intrusões / SIEM' }
+      ]},
+      { id: 'c5', name: 'Projetos & Código', links: [
+        { id: 'l8', name: 'Jira', url: 'https://www.atlassian.com/software/jira', desc: 'Gestão de tarefas e incidentes' },
+        { id: 'l9', name: 'GitLab', url: 'https://gitlab.com', desc: 'Repositórios e CI/CD' }
+      ]},
+      { id: 'c6', name: 'Rede', links: [
+        { id: 'l10', name: 'UniFi Controller', url: 'https://www.ui.com', desc: 'Gestão de rede Wi-Fi' },
+        { id: 'l11', name: 'pfSense', url: 'https://www.pfsense.org', desc: 'Firewall / router' }
+      ]},
+      { id: 'c7', name: 'Comunicação', links: [
+        { id: 'l12', name: 'Mattermost', url: 'https://mattermost.com', desc: 'Chat interno da equipa técnica' }
+      ]}
+    ]
+  };
+
+  let state = null;
+  let search = '';
+  let addingCatOpen = false;
+  let addingLinkTo = null;
+  let editingLinkId = null;
+  let editingCatId = null;
+  let lockError = '';
+
+  function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  // Ofuscação simples (NÃO é encriptação real) só para não deixar a password
+  // guardada em texto simples no localStorage. Ver aviso no chat.
+  function simpleHash(str) {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36);
+  }
+
+  function boot() {
+    const pwdHash = localStorage.getItem(LOCK_KEY);
+    const unlocked = sessionStorage.getItem(SESSION_FLAG) === '1';
+    if (!pwdHash) { renderSetup(); return; }
+    if (!unlocked) { renderLogin(); return; }
+    loadData();
+  }
+
+  window.ptSubmitSetup = function (ev) {
+    ev.preventDefault();
+    const f = ev.target.elements;
+    const p1 = f.pwd.value;
+    const p2 = f.pwd2.value;
+    if (p1.length < 4) { lockError = 'A password precisa de pelo menos 4 caracteres.'; renderSetup(); return; }
+    if (p1 !== p2) { lockError = 'As passwords não coincidem.'; renderSetup(); return; }
+    localStorage.setItem(LOCK_KEY, simpleHash(p1));
+    sessionStorage.setItem(SESSION_FLAG, '1');
+    lockError = '';
+    loadData();
+  };
+
+  window.ptSubmitLogin = function (ev) {
+    ev.preventDefault();
+    const p = ev.target.elements.pwd.value;
+    const stored = localStorage.getItem(LOCK_KEY);
+    if (simpleHash(p) === stored) {
+      sessionStorage.setItem(SESSION_FLAG, '1');
+      lockError = '';
+      loadData();
+    } else {
+      lockError = 'Password incorreta.';
+      renderLogin();
+    }
+  };
+
+  window.ptForgotPassword = function () {
+    const ok = confirm(
+      'Isto remove a password atual (os links guardados mantêm-se, porque não estão encriptados). ' +
+      'Vais poder definir uma password nova a seguir. Continuar?'
+    );
+    if (!ok) return;
+    localStorage.removeItem(LOCK_KEY);
+    sessionStorage.removeItem(SESSION_FLAG);
+    lockError = '';
+    boot();
+  };
+
+  window.ptLogout = function () {
+    sessionStorage.removeItem(SESSION_FLAG);
+    boot();
+  };
+
+  function renderSetup() {
+    const app = document.getElementById('pt-app');
+    app.className = '';
+    app.innerHTML =
+      '<div class="pt-lock-wrap"><div class="pt-lock-box">' +
+        '<div class="pt-lock-title pt-mono">Proteger o Portal TI</div>' +
+        '<div class="pt-lock-sub">Define uma password para abrir este portal neste computador.</div>' +
+        (lockError ? '<div class="pt-lock-error">' + esc(lockError) + '</div>' : '') +
+        '<form onsubmit="ptSubmitSetup(event)">' +
+          '<input class="pt-input" style="margin-bottom:8px;" type="password" name="pwd" placeholder="Nova password" autofocus required />' +
+          '<input class="pt-input" style="margin-bottom:12px;" type="password" name="pwd2" placeholder="Confirmar password" required />' +
+          '<button type="submit" class="pt-btn amber" style="width:100%;">Guardar e entrar</button>' +
+        '</form>' +
+        '<div class="pt-lock-hint">Esta password fica só neste browser, neste computador — não existe recuperação por email. Se a perderes, só é possível repor (o que apaga a proteção, não os links).</div>' +
+      '</div></div>';
+  }
+
+  function renderLogin() {
+    const app = document.getElementById('pt-app');
+    app.className = '';
+    app.innerHTML =
+      '<div class="pt-lock-wrap"><div class="pt-lock-box">' +
+        '<div class="pt-lock-title pt-mono">Portal TI</div>' +
+        '<div class="pt-lock-sub">Introduz a password para continuar.</div>' +
+        (lockError ? '<div class="pt-lock-error">' + esc(lockError) + '</div>' : '') +
+        '<form onsubmit="ptSubmitLogin(event)">' +
+          '<input class="pt-input" style="margin-bottom:12px;" type="password" name="pwd" placeholder="Password" autofocus required />' +
+          '<button type="submit" class="pt-btn amber" style="width:100%;">Entrar</button>' +
+        '</form>' +
+        '<div class="pt-lock-hint">' +
+          'Esqueceste-te? <button class="pt-lock-link" onclick="ptForgotPassword()">Repor password</button>' +
+        '</div>' +
+      '</div></div>';
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      state = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(defaultData));
+      if (!raw) saveData();
+    } catch (e) {
+      console.error('Falha ao ler dados guardados, a usar lista de exemplo', e);
+      state = JSON.parse(JSON.stringify(defaultData));
+    }
+    renderApp();
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error('Falha ao guardar (armazenamento do browser cheio ou bloqueado)', e);
+      alert('Não foi possível guardar as alterações neste browser.');
+    }
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function safeUrl(u) {
+    u = String(u || '').trim();
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    return esc(u);
+  }
+
+  function matches(cat, link) {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return cat.name.toLowerCase().includes(q) ||
+      link.name.toLowerCase().includes(q) ||
+      (link.desc || '').toLowerCase().includes(q) ||
+      (link.url || '').toLowerCase().includes(q);
+  }
+
+  window.ptSetSearch = function (v) { search = v; renderApp(); };
+
+  window.ptToggleAddCat = function () { addingCatOpen = !addingCatOpen; renderApp(); };
+  window.ptSubmitAddCat = function (ev) {
+    ev.preventDefault();
+    const name = ev.target.elements.name.value.trim();
+    if (!name) return;
+    state.categories.push({ id: uid('c'), name, links: [] });
+    addingCatOpen = false;
+    saveData(); renderApp();
+  };
+
+  window.ptDeleteCat = function (catId) {
+    const cat = state.categories.find(c => c.id === catId);
+    if (!cat) return;
+    if (!confirm('Remover a categoria "' + cat.name + '" e todos os seus links?')) return;
+    state.categories = state.categories.filter(c => c.id !== catId);
+    saveData(); renderApp();
+  };
+
+  window.ptStartEditCat = function (catId) { editingCatId = catId; renderApp(); };
+  window.ptSubmitEditCat = function (ev, catId) {
+    ev.preventDefault();
+    const name = ev.target.elements.name.value.trim();
+    const cat = state.categories.find(c => c.id === catId);
+    if (cat && name) cat.name = name;
+    editingCatId = null;
+    saveData(); renderApp();
+  };
+  window.ptCancelEditCat = function () { editingCatId = null; renderApp(); };
+
+  window.ptToggleAddLink = function (catId) { addingLinkTo = addingLinkTo === catId ? null : catId; editingLinkId = null; renderApp(); };
+  window.ptSubmitAddLink = function (ev, catId) {
+    ev.preventDefault();
+    const f = ev.target.elements;
+    const name = f.name.value.trim();
+    const url = f.url.value.trim();
+    if (!name || !url) return;
+    const cat = state.categories.find(c => c.id === catId);
+    cat.links.push({ id: uid('l'), name, url, desc: f.desc.value.trim() });
+    addingLinkTo = null;
+    saveData(); renderApp();
+  };
+
+  window.ptStartEditLink = function (linkId) { editingLinkId = linkId; addingLinkTo = null; renderApp(); };
+  window.ptCancelEditLink = function () { editingLinkId = null; renderApp(); };
+  window.ptSubmitEditLink = function (ev, catId, linkId) {
+    ev.preventDefault();
+    const f = ev.target.elements;
+    const name = f.name.value.trim();
+    const url = f.url.value.trim();
+    if (!name || !url) return;
+    const cat = state.categories.find(c => c.id === catId);
+    const link = cat.links.find(l => l.id === linkId);
+    link.name = name; link.url = url; link.desc = f.desc.value.trim();
+    editingLinkId = null;
+    saveData(); renderApp();
+  };
+
+  window.ptDeleteLink = function (catId, linkId) {
+    const cat = state.categories.find(c => c.id === catId);
+    const link = cat.links.find(l => l.id === linkId);
+    if (!confirm('Remover o link "' + link.name + '"?')) return;
+    cat.links = cat.links.filter(l => l.id !== linkId);
+    saveData(); renderApp();
+  };
+
+  window.ptResetAll = function () {
+    if (!confirm('Repor a lista de exemplo? Isto substitui os links atuais guardados neste browser.')) return;
+    state = JSON.parse(JSON.stringify(defaultData));
+    saveData(); renderApp();
+  };
+
+  function linkForm(prefill, submitAttr, cancelAttr) {
+    prefill = prefill || {};
+    return '<form class="pt-form" onsubmit="' + submitAttr + '">' +
+      '<input class="pt-input" name="name" placeholder="Nome (ex: GLPI)" value="' + esc(prefill.name) + '" required />' +
+      '<input class="pt-input" name="url" placeholder="URL (ex: https://glpi.dept.pt)" value="' + esc(prefill.url) + '" required />' +
+      '<input class="pt-input" name="desc" placeholder="Descrição breve (opcional)" value="' + esc(prefill.desc) + '" />' +
+      '<div class="pt-form-actions">' +
+        '<button type="submit" class="pt-btn amber">Guardar</button>' +
+        '<button type="button" class="pt-btn" onclick="' + cancelAttr + '">Cancelar</button>' +
+      '</div>' +
+    '</form>';
+  }
+
+  function renderApp() {
+    const app = document.getElementById('pt-app');
+    if (!state) { app.className = 'pt-loading'; app.textContent = 'A carregar painel…'; return; }
+    app.className = '';
+
+    let html = '';
+    html += '<div class="pt-header">' +
+      '<div class="pt-eyebrow pt-mono">Departamento Informático · Painel de Acessos</div>' +
+      '<h1 class="pt-title">Portal TI</h1>' +
+      '<div class="pt-sub">Todos os links das plataformas usadas pela equipa, organizados por área. Os links de exemplo apontam para os sites oficiais das ferramentas — edita-os para as instâncias internas do teu departamento.</div>' +
+    '</div>';
+
+    html += '<div class="pt-toolbar">' +
+      '<input class="pt-search" placeholder="Pesquisar ferramenta, categoria ou descrição…" value="' + esc(search) + '" oninput="ptSetSearch(this.value)" />' +
+      '<button class="pt-btn amber" onclick="ptToggleAddCat()">+ Nova categoria</button>' +
+    '</div>';
+
+    html += '<div class="pt-grid">';
+
+    state.categories.forEach((cat, idx) => {
+      const visibleLinks = cat.links.filter(l => matches(cat, l));
+      if (search && visibleLinks.length === 0 && !cat.name.toLowerCase().includes(search.toLowerCase())) return;
+
+      const tagNum = String(idx + 1).padStart(2, '0');
+      html += '<div class="pt-panel"><div class="pt-tag pt-mono">U' + tagNum + '</div><div class="pt-box">';
+
+      if (editingCatId === cat.id) {
+        html += '<form class="pt-cat-head" style="border-bottom:none;padding-bottom:0;margin-bottom:0;" onsubmit="ptSubmitEditCat(event,\'' + cat.id + '\')">' +
+          '<input class="pt-input" name="name" value="' + esc(cat.name) + '" required />' +
+          '<div class="pt-form-actions" style="margin-top:0;">' +
+            '<button type="submit" class="pt-btn amber">OK</button>' +
+            '<button type="button" class="pt-btn" onclick="ptCancelEditCat()">×</button>' +
+          '</div>' +
+        '</form>';
+      } else {
+        html += '<div class="pt-cat-head">' +
+          '<span class="pt-cat-name">' + esc(cat.name) + '</span>' +
+          '<span class="pt-cat-actions">' +
+            '<button class="pt-icon" title="Editar categoria" onclick="ptStartEditCat(\'' + cat.id + '\')">✎</button>' +
+            '<button class="pt-icon danger" title="Remover categoria" onclick="ptDeleteCat(\'' + cat.id + '\')">×</button>' +
+          '</span>' +
+        '</div>';
+      }
+
+      if (visibleLinks.length === 0) {
+        html += '<div class="pt-empty">Sem ferramentas aqui ainda.</div>';
+      }
+
+      visibleLinks.forEach(link => {
+        if (editingLinkId === link.id) {
+          html += linkForm(link, 'ptSubmitEditLink(event,\'' + cat.id + '\',\'' + link.id + '\')', 'ptCancelEditLink()');
+        } else {
+          html += '<div class="pt-link-row">' +
+            '<span class="pt-jack"></span>' +
+            '<div class="pt-link-body">' +
+              '<a class="pt-link-name" href="' + safeUrl(link.url) + '" target="_blank" rel="noopener noreferrer">' + esc(link.name) + ' <span style="font-size:11px;">↗</span></a>' +
+              '<span class="pt-link-url pt-mono">' + esc(link.url) + '</span>' +
+              (link.desc ? '<div class="pt-link-desc">' + esc(link.desc) + '</div>' : '') +
+            '</div>' +
+            '<span class="pt-link-actions">' +
+              '<button class="pt-icon" title="Editar" onclick="ptStartEditLink(\'' + link.id + '\')">✎</button>' +
+              '<button class="pt-icon danger" title="Remover" onclick="ptDeleteLink(\'' + cat.id + '\',\'' + link.id + '\')">×</button>' +
+            '</span>' +
+          '</div>';
+        }
+      });
+
+      if (addingLinkTo === cat.id) {
+        html += linkForm({}, 'ptSubmitAddLink(event,\'' + cat.id + '\')', 'ptToggleAddLink(\'' + cat.id + '\')');
+      } else {
+        html += '<div style="margin-top:8px;"><button class="pt-btn" style="font-size:11px;padding:6px 10px;" onclick="ptToggleAddLink(\'' + cat.id + '\')">+ Link</button></div>';
+      }
+
+      html += '</div></div>';
+    });
+
+    if (addingCatOpen) {
+      html += '<div class="pt-panel"><div class="pt-addcat">' +
+        '<form onsubmit="ptSubmitAddCat(event)" style="width:100%;display:flex;gap:8px;">' +
+          '<input class="pt-input" name="name" placeholder="Nome da categoria" required autofocus />' +
+          '<button type="submit" class="pt-btn amber">OK</button>' +
+        '</form>' +
+      '</div></div>';
+    }
+
+    html += '</div>';
+
+    html += '<div class="pt-footer">' +
+      '<span>Dados guardados automaticamente neste browser, neste computador (não são partilhados com mais ninguém).</span>' +
+      '<span style="display:flex;gap:14px;">' +
+        '<button class="pt-reset" onclick="ptResetAll()">Repor lista de exemplo</button>' +
+        '<button class="pt-reset" onclick="ptLogout()">Sair</button>' +
+      '</span>' +
+    '</div>';
+
+    app.innerHTML = html;
+  }
+
+  boot();
+})();
+</script>
+
+</body>
+</html>
